@@ -5,6 +5,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import RenderCampsite from '../features/campsites/RenderCampsite.js';
 import { toggleFavorite } from '../features/favorites/favoritesSlice.js';
 import { postComment } from '../features/comments/commentsSlice.js';
+import * as Animatedable from 'react-native-animatable';
+
 
 const CampsiteInfoScreen = ({ route }) => {
     const [showModal, setShowModal] = useState(false);
@@ -56,42 +58,46 @@ const CampsiteInfoScreen = ({ route }) => {
     };
 
     return (
-        <>
-        <FlatList
-            data={comments.commentsArray.filter(
-                (comment) => comment.campsiteId === campsite.id
-            )}
-            renderItem={renderCommentItem}
-            keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={{
-                marginHorizontal: 20,
-                paddingVertical: 20
-            }}
-            ListHeaderComponent={
-                <>
-                    <RenderCampsite
-                        onShowModal={() => setShowModal(!showModal)}
-                        campsite={campsite}
-                        isFavorite={favorites.includes(campsite.id)}
-                        markFavorite={() => dispatch(toggleFavorite(campsite.id))}
+        <Animatedable.View
+                    animation='fadeInDownBig'
+                    duration={2000}
+                    delay={1000}
+                >
+            <FlatList
+                data={comments.commentsArray.filter(
+                    (comment) => comment.campsiteId === campsite.id
+                )}
+                renderItem={renderCommentItem}
+                keyExtractor={(item) => item.id.toString()}
+                contentContainerStyle={{
+                    marginHorizontal: 20,
+                    paddingVertical: 20
+                }}
+                ListHeaderComponent={
+                    <>
+                        <RenderCampsite
+                            onShowModal={() => setShowModal(!showModal)}
+                            campsite={campsite}
+                            isFavorite={favorites.includes(campsite.id)}
+                            markFavorite={() => dispatch(toggleFavorite(campsite.id))}
+                        />
+                        <Text style={styles.commentsTitle}>Comments</Text>
+                    </>
+                }
+            />
+            <Modal 
+                animationType='slide'
+                transparent={false}
+                visible={showModal}
+                onRequestClose={() => setShowModal(!showModal)}>
+                <View style={styles.modal}>
+                    <Rating 
+                        showRating={true}
+                        startingValue={5} 
+                        imageSize={40}
+                        onFinishRating={(rating) => setRating(rating)} 
+                        style={{ paddingVertical: 10 }}
                     />
-                    <Text style={styles.commentsTitle}>Comments</Text>
-                </>
-            }
-        />
-        <Modal 
-            animationType='slide'
-            transparent={false}
-            visible={showModal}
-            onRequestClose={() => setShowModal(!showModal)}>
-            <View style={styles.modal}>
-                <Rating 
-                    showRating={true}
-                    startingValue={5} 
-                    imageSize={40}
-                    onFinishRating={(rating) => setRating(rating)} 
-                    style={{ paddingVertical: 10 }}
-                />
                 <Input 
                     placeholder='Author' 
                     leftIcon={{name: 'user-o', type:'font-awesome', color: '#FF0000'}} 
@@ -124,11 +130,10 @@ const CampsiteInfoScreen = ({ route }) => {
                     }} 
                     color="#808080" 
                     title="cancel"
-                />
-               </View>
-            </View>
-        </Modal>
-        </>
+                /></View>
+                </View>
+            </Modal>
+        </Animatedable.View>
     );
 };
 
