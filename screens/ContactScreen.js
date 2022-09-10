@@ -1,12 +1,12 @@
 import { ScrollView, Text } from 'react-native';
 import { Card } from 'react-native-elements';
-import * as Animatedable from 'react-native-animatable';
+import * as Animatable from 'react-native-animatable';
 
 
 const ContactScreen = () => {
     return (
         <ScrollView>
-            <Animatedable.View
+            <Animatable.View
                     animation='fadeInDownBig'
                     duration={2000}
                     delay={1000}
@@ -22,7 +22,7 @@ const ContactScreen = () => {
                     <Text>Phone: 1-206-555-1234</Text>
                     <Text>Email: campsites@nucamp.co</Text>
                 </Card>
-            </Animatedable.View>
+            </Animatable.View>
         </ScrollView>
     )
 }
