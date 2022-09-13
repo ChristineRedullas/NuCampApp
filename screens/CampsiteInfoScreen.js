@@ -20,7 +20,7 @@ const CampsiteInfoScreen = ({ route }) => {
     
 
 
-    const handleSumbit = () => {
+    const handleSubmit = () => {
         const newComment = {
             campsiteId: campsite.id,
             author,
@@ -117,7 +117,7 @@ const CampsiteInfoScreen = ({ route }) => {
                         title="Submit" 
                         color="#3960a1" 
                         onPress={() => {
-                            handleSumbit();
+                            handleSubmit();
                             resetForm();
                         }} 
                     />
