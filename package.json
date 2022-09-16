@@ -37,7 +37,8 @@
     "redux-persist": "^6.0.0",
     "expo-secure-store": "~11.1.0",
     "expo-notifications": "~0.14.0",
-    "expo-mail-composer": "~11.1.0"
+    "expo-mail-composer": "~11.1.0",
+    "@react-navigation/bottom-tabs": "5.11.15"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"
