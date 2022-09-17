@@ -6,6 +6,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as ImagePicker from 'expo-image-picker';
 import { baseUrl } from '../shared/baseUrl';
 import logo from '../assets/images/logo.png';
+import * as ImageManipulator from 'expo-image-manipulator';
+import { MediaLibrary } from 'expo-media-library';
 
 const LoginTab = ({ navigation }) => {
     const [username, setUsername] = useState('');
@@ -15,7 +17,7 @@ const LoginTab = ({ navigation }) => {
     const handleLogin = () => {
         console.log('username:', username);
         console.log('password:', password);
-        console.log('remember:', remember);
+        console.log('remember :', remember);
         if (remember) {
             SecureStore.setItemAsync(
                 'userinfo',
@@ -23,9 +25,9 @@ const LoginTab = ({ navigation }) => {
                     username,
                     password
                 })
-            ).catch((error) => console.log('Could not save user info', error));  
+            ).catch((error) => console.log('Could not save user info', error));
         } else {
-            SecureStore.deleteItemAsync('userinfo').catch((error) => 
+            SecureStore.deleteItemAsync('userinfo').catch((error) =>
                 console.log('Could not delete user info', error)
             );
         }
@@ -39,27 +41,27 @@ const LoginTab = ({ navigation }) => {
                 setPassword(userinfo.password);
                 setRemember(true);
             }
-        }); 
+        });
     }, []);
 
     return (
         <View style={styles.container}>
             <Input
                 placeholder='Username'
-                leftIcon={{ type: 'font-awesome', name: 'user-o'}}
+                leftIcon={{ type: 'font-awesome', name: 'user-o' }}
                 onChangeText={(text) => setUsername(text)}
                 value={username}
                 containerStyle={styles.formInput}
                 leftIconContainerStyle={styles.formIcon}
-               /> 
+            />
             <Input
                 placeholder='Password'
-                leftIcon={{ type: 'font-awesome', name: 'key'}}
+                leftIcon={{ type: 'font-awesome', name: 'key' }}
                 onChangeText={(text) => setPassword(text)}
                 value={password}
                 containerStyle={styles.formInput}
                 leftIconContainerStyle={styles.formIcon}
-               /> 
+            />
             <CheckBox
                 title='Remember Me'
                 center
@@ -71,9 +73,9 @@ const LoginTab = ({ navigation }) => {
                 <Button
                     onPress={() => handleLogin()}
                     title='Login'
-                    color= '#5637DD'
-                    icon= {
-                        <Icon 
+                    color='#5637DD'
+                    icon={
+                        <Icon
                             name='sign-in'
                             type='font-awesome'
                             color='#fff'
@@ -88,8 +90,8 @@ const LoginTab = ({ navigation }) => {
                     onPress={() => navigation.navigate('Register')}
                     title='Register'
                     type='clear'
-                    icon= {
-                        <Icon 
+                    icon={
+                        <Icon
                             name='user-plus'
                             type='font-awesome'
                             color='blue'
@@ -129,81 +131,111 @@ const RegisterTab = () => {
                     username,
                     password
                 })
-            ).catch((error) => console.log('Could not save user info', error));  
+            ).catch((error) => console.log('Could not save user info', error));
         } else {
-            SecureStore.deleteItemAsync('userinfo').catch((error) => 
+            SecureStore.deleteItemAsync('userinfo').catch((error) =>
                 console.log('Could not delete user info', error)
             );
         }
     };
 
     const getImageFromCamera = async () => {
-        const cameraPermission =
+        const cameraPermission = 
             await ImagePicker.requestCameraPermissionsAsync();
 
-        if (cameraPermission.status === 'granted') {
-            const capturedImage = await ImagePicker.launchCameraAsync({
-                allowsEditing: true,
-                aspect: [1, 1]
-            });
-            if (!capturedImage.cancelled) {
-                console.log(capturedImage);
-                setImageUrl(captureImage.uri);
+            if(cameraPermission.status === 'granted') {
+                const capturedImage = await ImagePicker.launchCameraAsync({
+                    allowsEditing: true,
+                    aspect: [1, 1]
+                });
+                if (!capturedImage.cancelled) {
+                    console.log(capturedImage);
+                    processImage(capturedImage.uri);
+                }
             }
-        }
-    };
+    }
+
+    const getImageFromGallery = async () => {
+        const mediaLibraryPermissions = 
+            await ImagePicker.getMediaLibraryPermissionsAsync(MediaLibrary.saveToLibrayAsync());
+
+            if(mediaLibraryPermissions === 'granted') {
+                const capturedImage = await ImagePicker.launchImageLibraryAsync({
+                    allowsEditing: true,
+                    aspect: [1, 1],
+                    
+                });
+                if (!capturedImage.cancelled) {
+                    console.log(capturedImage);
+                    processImage(capturedImage.uri);
+                }
+
+            }
+
+    }
+
+    const processImage = async (imgUri) => {
+        let processedImage = await ImageManipulator.manipulateAsync(
+            imgUri, 
+            [{ resize: { width: 400 }}], 
+            { format: 'png' }
+            );
+        console.log(processedImage);
+        setImageUrl(processedImage.uri);
+    }
 
     return (
         <ScrollView>
             <View style={styles.container}>
                 <View style={styles.imageContainer}>
-                    <Image
+                    <Image 
                         source={{ uri: imageUrl }}
                         loadingIndicatorSource={logo}
                         style={styles.image}
                     />
                     <Button title='Camera' onPress={getImageFromCamera} />
+                    <Button title='Gallery' onPress={getImageFromGallery} />
                 </View>
                 <Input
                     placeholder='Username'
-                    leftIcon={{ type: 'font-awesome', name: 'user-o'}}
+                    leftIcon={{ type: 'font-awesome', name: 'user-o' }}
                     onChangeText={(text) => setUsername(text)}
                     value={username}
                     containerStyle={styles.formInput}
                     leftIconContainerStyle={styles.formIcon}
-                /> 
+                />
                 <Input
                     placeholder='Password'
-                    leftIcon={{ type: 'font-awesome', name: 'key'}}
+                    leftIcon={{ type: 'font-awesome', name: 'key' }}
                     onChangeText={(text) => setPassword(text)}
                     value={password}
                     containerStyle={styles.formInput}
                     leftIconContainerStyle={styles.formIcon}
-                /> 
+                />
                 <Input
                     placeholder='First Name'
-                    leftIcon={{ type: 'font-awesome', name: 'user-o'}}
+                    leftIcon={{ type: 'font-awesome', name: 'user-o' }}
                     onChangeText={(text) => setFirstName(text)}
                     value={firstName}
                     containerStyle={styles.formInput}
                     leftIconContainerStyle={styles.formIcon}
-                /> 
+                />
                 <Input
                     placeholder='Last Name'
-                    leftIcon={{ type: 'font-awesome', name: 'user-o'}}
+                    leftIcon={{ type: 'font-awesome', name: 'user-o' }}
                     onChangeText={(text) => setLastName(text)}
                     value={lastName}
                     containerStyle={styles.formInput}
                     leftIconContainerStyle={styles.formIcon}
-                /> 
+                />
                 <Input
                     placeholder='Email'
-                    leftIcon={{ type: 'font-awesome', name: 'envelope-o'}}
+                    leftIcon={{ type: 'font-awesome', name: 'envelope-o' }}
                     onChangeText={(text) => setEmail(text)}
                     value={email}
                     containerStyle={styles.formInput}
                     leftIconContainerStyle={styles.formIcon}
-                /> 
+                />
                 <CheckBox
                     title='Remember Me'
                     center
@@ -211,25 +243,25 @@ const RegisterTab = () => {
                     onPress={() => setRemember(!remember)}
                     containerStyle={styles.formCheckbox}
                 />
-            <View style={styles.formButton}>
-                <Button
-                    onPress={() => handleRegister()}
-                    title='Register'
-                    color= '#5637DD'
-                    icon= {
-                        <Icon 
-                            name='user-plus'
-                            type='font-awesome'
-                            color='#fff'
-                            iconStyle={{ marginRight: 10 }}
-                        />
-                    }
-                    buttonStyle={{ backgroundColor: '#5637DD' }}
-                />
+                <View style={styles.formButton}>
+                    <Button
+                        onPress={() => handleRegister()}
+                        title='Register'
+                        color='#5637DD'
+                        icon={
+                            <Icon
+                                name='user-plus'
+                                type='font-awesome'
+                                color='#fff'
+                                iconStyle={{ marginRight: 10 }}
+                            />
+                        }
+                        buttonStyle={{ backgroundColor: '#5637DD' }}
+                    />
+                </View>
             </View>
-        </View>              
-    </ScrollView>
-    )
+        </ScrollView>
+    );
 };
 
 const Tab = createBottomTabNavigator();
@@ -251,12 +283,12 @@ const LoginScreen = () => {
                 options={{
                     tabBarIcon: (props) => {
                         return (
-                            <Icon   
+                            <Icon
                                 name='sign-in'
                                 type='font-awesome'
                                 color={props.color}
                             />
-                        )
+                        );
                     }
                 }}
             />
@@ -266,7 +298,7 @@ const LoginScreen = () => {
                 options={{
                     tabBarIcon: (props) => {
                         return (
-                            <Icon   
+                            <Icon
                                 name='user-plus'
                                 type='font-awesome'
                                 color={props.color}
@@ -275,11 +307,9 @@ const LoginScreen = () => {
                     }
                 }}
             />
-
         </Tab.Navigator>
-    )
-
-}
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -294,7 +324,7 @@ const styles = StyleSheet.create({
         height: 60
     },
     formCheckbox: {
-        padding: 8,
+        margin: 8,
         backgroundColor: null
     },
     formButton: {
@@ -310,10 +340,10 @@ const styles = StyleSheet.create({
         margin: 10
     },
     image: {
-        width: 60,
-        height: 60
+        height: 60,
+        width: 60
     }
-
 });
+
 
 export default LoginScreen;
